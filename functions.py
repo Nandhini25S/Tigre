@@ -44,3 +44,41 @@ def draft_email(user_input, name="Nandhini"):
         {"user_input": user_input, "signature": signature, "name": name})
 
     return response
+
+
+def set_reminder(event_name, event_time):
+    chat = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=1)
+
+    template = """    
+    You are a helpful assistant that sets reminders for calendar events.
+
+    Your goal is to help the user quickly create a reminder for an upcoming event.
+    
+    Provide the event name and time in a clear and concise manner.
+    
+    Start your reminder by saying: "Sure! I've set a reminder for {event_name} at {event_time}.". 
+    
+    And then proceed with any additional details on a new line.
+    
+    """
+
+    system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+
+    human_template = "Please set a reminder for the following event: {event_name} at {event_time}."
+    human_message_prompt = HumanMessagePromptTemplate.from_template(
+        human_template)
+
+    chat_prompt = ChatPromptTemplate.from_messages(
+        [system_message_prompt, human_message_prompt]
+    )
+
+    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    response = chain.invoke(
+        {"event_name": event_name, "event_time": event_time})
+
+    return response
+
+
+# if __name__ == "__main__":
+#     print(draft_email("Hello! I am writing to inquire about the status of my application."))
+#     print(set_reminder("Interview", "3:00 PM"))
